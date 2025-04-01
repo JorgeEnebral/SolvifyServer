@@ -12,15 +12,15 @@ class Category(models.Model):
 class Auction(models.Model):
     title = models.CharField(max_length=150)
     description = models.TextField()
+    closing_date = models.DateTimeField()
+    creation_date = models.DateTimeField(auto_now_add=True)
+    thumbnail = models.URLField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    rating = models.DecimalField(max_digits=3, decimal_places=2)
     stock = models.IntegerField()
-    brand = models.CharField(max_length=100)
+    rating = models.DecimalField(max_digits=3, decimal_places=2)
     category = models.ForeignKey(Category, related_name='auctions',
     on_delete=models.CASCADE)
-    thumbnail = models.URLField()
-    creation_date = models.DateTimeField(auto_now_add=True)
-    closing_date = models.DateTimeField()
+    brand = models.CharField(max_length=100)
     
     class Meta:
         ordering=('id',)
