@@ -3,10 +3,10 @@ from .views import CategoryListCreate, CategoryRetrieveUpdateDestroy, AuctionLis
 
 app_name="auctions"
 urlpatterns = [
-    path('subastas/categorias', CategoryListCreate.as_view(), name='category-list-create'),
-    path('subastas/categorias/<int:pk>/', CategoryRetrieveUpdateDestroy.as_view(), name='category-detail'),
+    path('categorias/', CategoryListCreate.as_view(), name='category-list-create'),
+    path('categorias/<int:pk>/', CategoryRetrieveUpdateDestroy.as_view(), name='category-detail'),
     path('', AuctionListCreate.as_view(), name='auction-list-create'),
     path('<int:pk>/', AuctionRetrieveUpdateDestroy.as_view(), name='auction-detail'),
-    path('subastas/<int:id_auctions>/pujas/', BidListCreate.as_view(), name='bid-list-create'),
-    path('subastas/<int:id_auctions>/pujas/<int:pk>/', BidRetrieveUpdateDestroy.as_view(), name='bid-detail')
+    path('<int:id_auctions>/pujas/', BidListCreate.as_view(), name='bid-list-create'),
+    path('<int:id_auctions>/pujas/<int:pk>/', BidRetrieveUpdateDestroy.as_view(), name='bid-detail')
 ]

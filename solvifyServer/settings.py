@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'auctions', #para asociar la nueva aplicación (auction) al proyecto
+    'subastas', #para asociar la nueva aplicación (auction) al proyecto
     'rest_framework', #para importar el framework django REST al proyecto
     'drf_spectacular', #para importar la extensión drf spectacular al proyecto
 ]
