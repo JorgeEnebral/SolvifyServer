@@ -14,6 +14,7 @@ class CategoryRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all() 
     serializer_class = CategoryDetailSerializer 
 
+
 class AuctionListCreate(generics.ListCreateAPIView):
     serializer_class = AuctionListCreateSerializer
 
@@ -24,6 +25,7 @@ class AuctionListCreate(generics.ListCreateAPIView):
         category = params.get("categoria", None)
         min_price = params.get("precioMin", None)
         max_price = params.get("precioMax", None)
+
         if text and len(text) < 3:
             raise ValidationError(
                 {"texto": "Texto query must be at least 3 characters long."},
@@ -34,6 +36,7 @@ class AuctionListCreate(generics.ListCreateAPIView):
                 Q(title__icontains=text) | 
                 Q(description__icontains=text)
             )
+
         if category:
             try:
                 category_obj = Category.objects.get(name=category)
@@ -43,6 +46,7 @@ class AuctionListCreate(generics.ListCreateAPIView):
                     {"categoria": "Categoria does not exist in the database."},
                     code=status.HTTP_404_NOT_FOUND
                 )
+            
         if min_price:
             if int(min_price) < 0:
                 raise ValidationError(
@@ -57,6 +61,12 @@ class AuctionListCreate(generics.ListCreateAPIView):
                     code=status.HTTP_400_BAD_REQUEST
                 )
             queryset = queryset.filter(price__lte=max_price)
+        if max_price and min_price and min_price > max_price:
+            raise ValidationError(
+                {"precioMax": "PrecioMax must be greater or equal than precioMin."},
+                code=status.HTTP_400_BAD_REQUEST
+            )
+        
         return queryset
 
 class AuctionRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView): 
