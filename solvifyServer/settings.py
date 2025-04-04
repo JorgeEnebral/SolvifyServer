@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-*mxnxlsl5+ru(bpfi%=)^v3&u4x8qfi44l+(gn3q2ch)u(-4h^
 DEBUG = True
 
 ALLOWED_HOSTS = ["127.0.0.1", 
-                 "@dpg-cvnrr1k9c44c73ahrdvg-a.oregon-postgres.render.com/db_solvify", 
+                 "@dpg-cvnrr1k9c44c73ahrdvg-a.oregon-postgres.render.com", 
                  "solvifyserver.onrender.com"]
 
 
