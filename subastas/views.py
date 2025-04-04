@@ -61,9 +61,9 @@ class AuctionListCreate(generics.ListCreateAPIView):
                     code=status.HTTP_400_BAD_REQUEST
                 )
             queryset = queryset.filter(price__lte=max_price)
-        if max_price and min_price and min_price > max_price:
+        if max_price and min_price and min_price >= max_price:
             raise ValidationError(
-                {"precioMax": "PrecioMax must be greater or equal than precioMin."},
+                {"precioMax": "PrecioMax must be greater than precioMin."},
                 code=status.HTTP_400_BAD_REQUEST
             )
         

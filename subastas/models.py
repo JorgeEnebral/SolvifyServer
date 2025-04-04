@@ -19,7 +19,7 @@ class Auction(models.Model):
     price = models.DecimalField(max_digits=10,
                                 decimal_places=2,
                                 validators=[MinValueValidator(0)])
-    stock = models.IntegerField(validators=[MinValueValidator(0)])
+    stock = models.IntegerField(validators=[MinValueValidator(1)])
     rating = models.DecimalField(max_digits=3,
                                  decimal_places=2,
                                  validators=[MinValueValidator(1), MaxValueValidator(5)])

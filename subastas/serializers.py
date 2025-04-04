@@ -4,6 +4,7 @@ from django.utils import timezone
 from .models import Category, Auction, Bid
 from datetime import timedelta
 
+
 class CategoryListCreateSerializer(serializers.ModelSerializer): 
     class Meta: 
         model = Category 
@@ -13,6 +14,7 @@ class CategoryDetailSerializer(serializers.ModelSerializer):
     class Meta: 
         model = Category 
         fields = '__all__'
+
 
 class AuctionListCreateSerializer(serializers.ModelSerializer): 
     # Estos dos campos los podemos usar así porque existían en el modelo
