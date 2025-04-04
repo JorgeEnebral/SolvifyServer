@@ -130,10 +130,6 @@ tensorboard==2.15.1
 tensorboard-data-server==0.7.2
 thinc==8.3.4
 threadpoolctl==3.5.0
-torch==2.6.0+cu126
-torchaudio==2.6.0+cu126
-torchvision==0.21.0+cu126
-tqdm==4.66.1
 typer==0.15.1
 typing_extensions==4.12.2
 unicorn==2.0.1.post1
