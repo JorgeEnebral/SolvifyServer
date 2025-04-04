@@ -15,7 +15,6 @@ cffi==1.17.1
 cloudpathlib==0.20.0
 colored-traceback==0.4.2
 colorzero==2.0
-conda-verify==3.4.2
 confection==0.1.5
 constantly==15.1.0
 cramjam==2.9.1
