@@ -31,7 +31,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ["127.0.0.1", 
                  "@dpg-cvnrr1k9c44c73ahrdvg-a.oregon-postgres.render.com", 
-                 "solvifyserver.onrender.com"]
+                 ]#"solvifyserver.onrender.com"]
 
 
 # Application definition
