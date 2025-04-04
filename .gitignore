@@ -1,0 +1,6 @@
+# Ignorar caché de Python
+__pycache__/
+*.py[cod]
+
+# Ignorar caché de MyPy
+.mypy_cache/
