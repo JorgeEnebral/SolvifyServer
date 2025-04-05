@@ -67,67 +67,6 @@ def load_data_to_local_db(products):
     print("Datos de dummyjson cargados a la BBDD")
 
 
-def post_category(name):
-    url = "https://solvifyserver.onrender.com/api/subastas/categorias/"
-    headers = {"Content-Type": "application/json"}
-    data = {"name": name}
-    response = requests.post(url, json=data, headers=headers)
-    if response.status_code == 201:
-        return response.json()["id"]  # Suponiendo que la API devuelve el ID de la categoría
-    else:
-        print(f"Error al crear categoría {name}: {response.status_code}")
-        return None
-
-def post_auction(product, category_id):
-    url = "https://solvifyserver.onrender.com/api/subastas/"
-    headers = {"Content-Type": "application/json"}
-    closing_date = datetime(
-        year=datetime.now().year,
-        month=random.randint(5, 12),
-        day=random.randint(1, 28),
-        hour=0, minute=0, second=0
-    ).isoformat()
-    
-    data = {
-        "title": product["title"],
-        "description": product["description"],
-        "closing_date": closing_date,
-        "creation_date": datetime.now().isoformat(),
-        "thumbnail": product["thumbnail"],
-        "price": product["price"],
-        "stock": product["stock"],
-        "rating": product["rating"],
-        "category": category_id,
-        "brand": product.get("brand", "Desconocida")
-    }
-    
-    response = requests.post(url, json=data, headers=headers)
-    if response.status_code == 201:
-        print(f"Subasta '{product['title']}' creada con éxito.")
-    else:
-        print(product)
-        print(f"Error al crear subasta {product['title']}: {response.status_code}")
-
-def load_data():
-    products = fetch_products()
-    if not products:
-        return
-    
-    category_map = {}
-    
-    for product in products:
-        category_name = product["category"]
-        if category_name not in category_map:
-            category_id = post_category(category_name)
-            if category_id:
-                category_map[category_name] = category_id
-    
-    for product in products:
-        category_id = category_map.get(product["category"])
-        if category_id:
-            post_auction(product, category_id)
-
-
 if __name__ == "__main__":
 
     products_dummyjson = fetch_products()
