@@ -152,9 +152,10 @@ SPECTACULAR_SETTINGS = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "https://solvify-das.vercel.app/",
-    "solvifyserver.onrender.com",
+    "*"
+    # "http://localhost:3000",
+    # "https://solvify-das.vercel.app/",
+    # "solvifyserver.onrender.com",
 ]
 CORS_ALLOW_CREDENTIALS = True
 
