@@ -151,12 +151,14 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
 }
 
-CORS_ALLOWED_ORIGINS = [
-    "*"
+# CORS_ALLOWED_ORIGINS = [
+#     "*"
     # "http://localhost:3000",
     # "https://solvify-das.vercel.app/",
     # "solvifyserver.onrender.com",
-]
+# ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_METHODS = [
