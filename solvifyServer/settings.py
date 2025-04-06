@@ -150,5 +150,9 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
 }
 
-CORS_ALLOWED_ORIGINS = ["http://127.0.0.1", "http://localhost:3000"]
+CORS_ALLOWED_ORIGINS = [
+    "http://127.0.0.1",
+    "http://localhost:3000",  # Agrega esta línea
+    "https://solvifyserver.onrender.com",
+]
 CORS_ALLOW_CREDENTIALS = True
