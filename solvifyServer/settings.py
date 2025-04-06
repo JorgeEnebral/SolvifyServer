@@ -30,6 +30,7 @@ SECRET_KEY = 'django-insecure-*mxnxlsl5+ru(bpfi%=)^v3&u4x8qfi44l+(gn3q2ch)u(-4h^
 DEBUG = True
 
 ALLOWED_HOSTS = ["127.0.0.1", 
+                 "localhost",
                  "@dpg-cvohpqh5pdvs739utoj0-a.oregon-postgres.render.com", 
                  "solvifyserver.onrender.com"]
 
@@ -156,3 +157,11 @@ CORS_ALLOWED_ORIGINS = [
     "solvifyserver.onrender.com",
 ]
 CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'DELETE',
+    'PATCH',
+]
