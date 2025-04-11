@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import CategoryListCreate, CategoryRetrieveUpdateDestroy, AuctionListCreate, AuctionRetrieveUpdateDestroy, BidListCreate, BidRetrieveUpdateDestroy 
+from .views import CategoryListCreate, CategoryRetrieveUpdateDestroy, AuctionListCreate, AuctionRetrieveUpdateDestroy, BidListCreate, BidRetrieveUpdateDestroy, UserAuctionListView
 
 app_name="auctions"
 urlpatterns = [
@@ -10,5 +10,7 @@ urlpatterns = [
     path('<int:pk>/', AuctionRetrieveUpdateDestroy.as_view(), name='auction-detail'),
     
     path('<int:id_auctions>/pujas/', BidListCreate.as_view(), name='bid-list-create'),
-    path('<int:id_auctions>/pujas/<int:pk>/', BidRetrieveUpdateDestroy.as_view(), name='bid-detail')
+    path('<int:id_auctions>/pujas/<int:pk>/', BidRetrieveUpdateDestroy.as_view(), name='bid-detail'),
+
+    path('usuarios/', UserAuctionListView.as_view(), name='action-from-users'), 
 ]

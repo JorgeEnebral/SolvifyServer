@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
+from usuarios.models import CustomUser
 
 # Create your models here.
 class Category(models.Model):
@@ -8,7 +9,7 @@ class Category(models.Model):
     class Meta:
         ordering=('id',)
     def __str__(self):
-        return self.name
+        return self.name 
     
 class Auction(models.Model):
     title = models.CharField(max_length=150)
@@ -23,9 +24,9 @@ class Auction(models.Model):
     rating = models.DecimalField(max_digits=3,
                                  decimal_places=2,
                                  validators=[MinValueValidator(1), MaxValueValidator(5)])
-    category = models.ForeignKey(Category, related_name='auctions',
-    on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, related_name='auctions', on_delete=models.CASCADE)
     brand = models.CharField(max_length=100)
+    auctioneer = models.ForeignKey(CustomUser, related_name='auctions', on_delete=models.CASCADE)
     
     class Meta:
         ordering=('id',)
