@@ -7,19 +7,23 @@ from django.db.models import Q
 from rest_framework.views import APIView 
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from .permissions import IsOwnerOrAdmin
+from .permissions import IsOwnerOrAdmin, IsRegisteredUserOrAdmin
+from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 
 # Create your views here.
 class CategoryListCreate(generics.ListCreateAPIView): 
+    permission_classes = [IsAdminUser] 
     queryset = Category.objects.all() 
     serializer_class = CategoryListCreateSerializer 
 
 class CategoryRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView): 
+    permission_classes = [IsAdminUser]
     queryset = Category.objects.all() 
     serializer_class = CategoryDetailSerializer 
 
 
 class AuctionListCreate(generics.ListCreateAPIView):
+    permission_classes = [IsRegisteredUserOrAdmin] 
     serializer_class = AuctionListCreateSerializer
 
     def get_queryset(self):
@@ -79,6 +83,7 @@ class AuctionRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = AuctionDetailSerializer
 
 class BidListCreate(generics.ListCreateAPIView):
+    permission_classes = [IsRegisteredUserOrAdmin]
     serializer_class = BidListCreateSerializer
 
     def get_queryset(self):
@@ -90,6 +95,7 @@ class BidListCreate(generics.ListCreateAPIView):
         serializer.save(auction=Auction.objects.get(id=auction_id))
 
 class BidRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsOwnerOrAdmin]
     serializer_class = BidDetailSerializer
 
     def get_queryset(self):

@@ -13,3 +13,15 @@ class IsOwnerOrAdmin(BasePermission):
  
         # Permitir si el usuario es el creador o es administrador 
         return obj.auctioneer == request.user or request.user.is_staff
+    
+class IsRegisteredUserOrAdmin(BasePermission):
+    """
+    Permite crear/editar/eliminar una subasta solo si el usuario está registrado
+    o es administrador. Cualqueira puede consultar (GET).
+    """
+
+    def has_permission(self, request, view):
+        if request.method in SAFE_METHODS:
+            return True
+        
+        return request.user.is_authenticated or request.user.is_staff

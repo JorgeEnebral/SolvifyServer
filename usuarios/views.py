@@ -8,10 +8,11 @@ from .serializers import UserSerializer, ChangePasswordSerializer
 from rest_framework.exceptions import ValidationError 
 from django.contrib.auth.password_validation import validate_password
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
+from .permissions import IsUnregisteredUser
 
 # Create your views here.
 class UserRegisterView(generics.CreateAPIView): 
-    permission_classes = [AllowAny] 
+    permission_classes = [IsUnregisteredUser] 
     queryset = CustomUser.objects.all() 
     serializer_class = UserSerializer 
  
