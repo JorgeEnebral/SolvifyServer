@@ -4,5 +4,4 @@ Autores: Jorge Enebral y Teresa Garvía
 
 Superusuario:
 - Usuario: solvify_admin
-- Email: admin@comillas.edu
-- Password: admin
+- Password: solvify_admin_1234
