@@ -13,6 +13,7 @@ django.setup()
 
 # Ahora puedes importar los modelos
 from subastas.models import Category, Auction, Bid  
+from usuarios.models import CustomUser
 from django.utils import timezone
 
 
@@ -31,9 +32,30 @@ def clear_sqlite_database():
     Bid.objects.all().delete()
     Auction.objects.all().delete()
     Category.objects.all().delete()
+    CustomUser.objects.all().delete()
     print("Base de datos vaciada.")
 
+
 def load_data_to_local_db(products):
+
+    # SUPERUSUARIO
+    admin = CustomUser.objects.create(
+            username="solvify_admin",
+            first_name="solvify",
+            last_name="admin",
+            email="solvify_admin@example.com",
+            password="solvify_admin_1234",
+            is_staff=True,
+            is_active=True,
+            is_superuser=True,
+            last_login=timezone.now(),
+            date_joined=timezone.now(),
+            birth_date="1990-01-01",
+            locality="Centro",
+            municipality="Capital"
+        )
+
+    # CATEGORIAS
     categories = {}
     for product in products:
         category_name = product["category"]
@@ -41,6 +63,7 @@ def load_data_to_local_db(products):
             category = Category.objects.create(name=category_name)
             categories[category_name] = category
 
+    # PRODUCTOS
     for product in products:
         closing_date_naive = datetime(
             year=datetime.now().year,
@@ -63,6 +86,7 @@ def load_data_to_local_db(products):
             rating=product["rating"],
             category=categories[product["category"]],
             brand=product.get("brand", "Desconocida"),
+            auctioneer=admin
         )
     print("Datos de dummyjson cargados a la BBDD")
 
