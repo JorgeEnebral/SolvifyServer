@@ -159,13 +159,13 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
 }
 
-CORS_ALLOWED_ORIGINS = [
-    # "http://127.0.0.1:3000",
-    # "http://localhost:3000",
-    "https://solvify-das.vercel.app/"
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "127.0.0.1:3000",
+#     "localhost:3000",
+#     "https://solvify-das.vercel.app/"
+# ]
 
-# CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
 
 SIMPLE_JWT = { 
