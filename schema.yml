@@ -360,37 +360,13 @@ paths:
       - api
       security:
       - jwtAuth: []
+      - {}
       responses:
         '200':
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/PaginatedCategoryListCreateList'
-          description: ''
-    post:
-      operationId: api_subastas_categorias_create
-      tags:
-      - api
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CategoryListCreate'
-          application/x-www-form-urlencoded:
-            schema:
-              $ref: '#/components/schemas/CategoryListCreate'
-          multipart/form-data:
-            schema:
-              $ref: '#/components/schemas/CategoryListCreate'
-        required: true
-      security:
-      - jwtAuth: []
-      responses:
-        '201':
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CategoryListCreate'
           description: ''
   /api/subastas/categorias/{id}/:
     get:
@@ -488,6 +464,32 @@ paths:
       responses:
         '204':
           description: No response body
+  /api/subastas/categorias/crear:
+    post:
+      operationId: api_subastas_categorias_crear_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryListCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CategoryListCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CategoryListCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryListCreate'
+          description: ''
   /api/subastas/mis-pujas/:
     get:
       operationId: api_subastas_mis_pujas_retrieve

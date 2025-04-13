@@ -35,11 +35,9 @@ def clear_sqlite_database():
     CustomUser.objects.all().delete()
     print("Base de datos vaciada.")
 
-
-def load_data_to_local_db(products):
-
+def crear_usuarios():
     # SUPERUSUARIO
-    admin = CustomUser.objects.create(
+    admin = CustomUser.objects.create_superuser(
             username="solvify_admin",
             first_name="solvify",
             last_name="admin",
@@ -54,6 +52,60 @@ def load_data_to_local_db(products):
             locality="Centro",
             municipality="Capital"
         )
+    
+    user1 = CustomUser.objects.create(
+        username="user1",
+        first_name="user",
+        last_name="1",
+        email="user1@example.com",
+        password="user1_1234",
+        is_staff=False,
+        is_active=False,
+        is_superuser=False,
+        last_login=timezone.now(),
+        date_joined=timezone.now(),
+        birth_date="1990-01-01",
+        locality="Centro",
+        municipality="Capital"
+    )
+
+    user2 = CustomUser.objects.create(
+        username="user2",
+        first_name="user",
+        last_name="2",
+        email="user2@example.com",
+        password="user2_1234",
+        is_staff=False,
+        is_active=False,
+        is_superuser=False,
+        last_login=timezone.now(),
+        date_joined=timezone.now(),
+        birth_date="1990-01-01",
+        locality="Centro",
+        municipality="Capital"
+    )
+    
+    return admin, user1, user2
+    
+def crear_pujas(productos, admin, user1, user2):
+
+    def crear_puja(user, auction, price):
+        Bid.objects.create(bidder=user.username, auction=auction, price=price)
+
+    crear_puja(admin, productos[0], 11)
+    crear_puja(user1, productos[0], 14)
+    crear_puja(user2, productos[0], 16)
+    crear_puja(admin, productos[0], 20)
+
+    crear_puja(user1, productos[1], 23)
+    crear_puja(user2, productos[1], 25)
+
+    crear_puja(user1, productos[2], 18)
+
+
+def load_data_to_local_db(products):
+
+    admin, user1, user2 = crear_usuarios()
 
     # CATEGORIAS
     categories = {}
@@ -64,6 +116,7 @@ def load_data_to_local_db(products):
             categories[category_name] = category
 
     # PRODUCTOS
+    productos = []
     for product in products:
         closing_date_naive = datetime(
             year=datetime.now().year,
@@ -74,7 +127,6 @@ def load_data_to_local_db(products):
 
         # Convertir el datetime naive a aware (con zona horaria)
         closing_date_aware = timezone.make_aware(closing_date_naive)
-
         auction = Auction.objects.create(
             title=product["title"],
             description=product["description"],
@@ -88,6 +140,10 @@ def load_data_to_local_db(products):
             brand=product.get("brand", "Desconocida"),
             auctioneer=admin
         )
+        productos.append(auction)
+
+    crear_pujas(productos, admin, user1, user2)
+
     print("Datos de dummyjson cargados a la BBDD")
 
 

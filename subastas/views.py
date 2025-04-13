@@ -10,10 +10,20 @@ from rest_framework.response import Response
 from .permissions import IsOwnerOrAdmin, IsRegisteredUserOrAdmin
 
 # Create your views here.
-class CategoryListCreate(generics.ListCreateAPIView): 
-    permission_classes = [IsAdminUser] 
-    queryset = Category.objects.all() 
-    serializer_class = CategoryListCreateSerializer 
+# class CategoryListCreate(generics.ListCreateAPIView): SI NO NO PUEDO PONER EN LA WEB LAS CATEGORÍAS COMO NOMBRE PARA LOS USUARIOS
+#     permission_classes = [IsAdminUser] 
+#     queryset = Category.objects.all() 
+#     serializer_class = CategoryListCreateSerializer 
+
+class CategoryList(generics.ListAPIView):
+    permission_classes = [AllowAny]
+    queryset = Category.objects.all()
+    serializer_class = CategoryListCreateSerializer
+
+class CategoryCreate(generics.CreateAPIView):
+    permission_classes = [IsAdminUser]
+    queryset = Category.objects.all()
+    serializer_class = CategoryListCreateSerializer
 
 class CategoryRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView): 
     permission_classes = [IsAdminUser] 
@@ -88,7 +98,7 @@ class BidListCreate(generics.ListCreateAPIView):
 
     def get_queryset(self):
         auction_id = self.kwargs["id_auctions"]
-        return Bid.objects.filter(id=auction_id)
+        return Bid.objects.filter(auction=auction_id)
     
     def perform_create(self, serializer):
         auction_id = self.kwargs["id_auctions"]
