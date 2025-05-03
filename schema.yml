@@ -1,0 +1,1190 @@
+openapi: 3.0.3
+info:
+  title: API Auctions
+  version: 1.0.0
+  description: Auctios web
+paths:
+  /api/login/:
+    post:
+      operationId: api_login_create
+      description: |-
+        Takes a set of user credentials and returns an access and refresh JSON web
+        token pair to prove the authentication of those credentials.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenObtainPair'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenObtainPair'
+          description: ''
+  /api/subastas/:
+    get:
+      operationId: api_subastas_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedAuctionListCreateList'
+          description: ''
+    post:
+      operationId: api_subastas_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuctionListCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuctionListCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AuctionListCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuctionListCreate'
+          description: ''
+  /api/subastas/{id_auctions}/pujas/:
+    get:
+      operationId: api_subastas_pujas_list
+      parameters:
+      - in: path
+        name: id_auctions
+        schema:
+          type: integer
+        required: true
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBidListCreateList'
+          description: ''
+    post:
+      operationId: api_subastas_pujas_create
+      parameters:
+      - in: path
+        name: id_auctions
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BidListCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BidListCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BidListCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BidListCreate'
+          description: ''
+  /api/subastas/{id_auctions}/pujas/{id}/:
+    get:
+      operationId: api_subastas_pujas_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id_auctions
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BidDetail'
+          description: ''
+    put:
+      operationId: api_subastas_pujas_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id_auctions
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BidDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BidDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BidDetail'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BidDetail'
+          description: ''
+    patch:
+      operationId: api_subastas_pujas_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id_auctions
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBidDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBidDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBidDetail'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BidDetail'
+          description: ''
+    delete:
+      operationId: api_subastas_pujas_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id_auctions
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/subastas/{id}/:
+    get:
+      operationId: api_subastas_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuctionDetail'
+          description: ''
+    put:
+      operationId: api_subastas_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuctionDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AuctionDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/AuctionDetail'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuctionDetail'
+          description: ''
+    patch:
+      operationId: api_subastas_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedAuctionDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedAuctionDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedAuctionDetail'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuctionDetail'
+          description: ''
+    delete:
+      operationId: api_subastas_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/subastas/categorias/:
+    get:
+      operationId: api_subastas_categorias_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedCategoryListCreateList'
+          description: ''
+  /api/subastas/categorias/{id}/:
+    get:
+      operationId: api_subastas_categorias_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryDetail'
+          description: ''
+    put:
+      operationId: api_subastas_categorias_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CategoryDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CategoryDetail'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryDetail'
+          description: ''
+    patch:
+      operationId: api_subastas_categorias_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCategoryDetail'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCategoryDetail'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCategoryDetail'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryDetail'
+          description: ''
+    delete:
+      operationId: api_subastas_categorias_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/subastas/categorias/crear:
+    post:
+      operationId: api_subastas_categorias_crear_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryListCreate'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CategoryListCreate'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CategoryListCreate'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryListCreate'
+          description: ''
+  /api/subastas/mis-pujas/:
+    get:
+      operationId: api_subastas_mis_pujas_retrieve
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/subastas/mis-subastas/:
+    get:
+      operationId: api_subastas_mis_subastas_retrieve
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/token/refresh/:
+    post:
+      operationId: api_token_refresh_create
+      description: |-
+        Takes a refresh type JSON web token and returns an access type JSON web
+        token if the refresh token is valid.
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TokenRefresh'
+        required: true
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenRefresh'
+          description: ''
+  /api/usuarios/:
+    get:
+      operationId: api_usuarios_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserList'
+          description: ''
+  /api/usuarios/{id}/:
+    get:
+      operationId: api_usuarios_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    put:
+      operationId: api_usuarios_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    patch:
+      operationId: api_usuarios_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUser'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+    delete:
+      operationId: api_usuarios_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/usuarios/cambiar-contrasena/:
+    post:
+      operationId: api_usuarios_cambiar_contrasena_create
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /api/usuarios/log-out/:
+    post:
+      operationId: api_usuarios_log_out_create
+      description: Realiza el logout eliminando el RefreshToken (revocar)
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/usuarios/perfil/:
+    get:
+      operationId: api_usuarios_perfil_retrieve
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+    patch:
+      operationId: api_usuarios_perfil_partial_update
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          description: No response body
+    delete:
+      operationId: api_usuarios_perfil_destroy
+      tags:
+      - api
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/usuarios/registrar/:
+    post:
+      operationId: api_usuarios_registrar_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/User'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+components:
+  schemas:
+    AuctionDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        creation_date:
+          type: string
+          format: date-time
+          readOnly: true
+        closing_date:
+          type: string
+          format: date-time
+        isOpen:
+          type: boolean
+          readOnly: true
+        title:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+        thumbnail:
+          type: string
+          format: uri
+          maxLength: 200
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        stock:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 1
+          format: int64
+        rating:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,1}(?:\.\d{0,2})?$
+        brand:
+          type: string
+          maxLength: 100
+        category:
+          type: integer
+        auctioneer:
+          type: integer
+      required:
+      - brand
+      - category
+      - closing_date
+      - creation_date
+      - description
+      - id
+      - isOpen
+      - price
+      - rating
+      - stock
+      - thumbnail
+      - title
+    AuctionListCreate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        creation_date:
+          type: string
+          format: date-time
+          readOnly: true
+        closing_date:
+          type: string
+          format: date-time
+        isOpen:
+          type: boolean
+          readOnly: true
+        title:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+        thumbnail:
+          type: string
+          format: uri
+          maxLength: 200
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        stock:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 1
+          format: int64
+        rating:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,1}(?:\.\d{0,2})?$
+        brand:
+          type: string
+          maxLength: 100
+        category:
+          type: integer
+        auctioneer:
+          type: integer
+      required:
+      - brand
+      - category
+      - closing_date
+      - creation_date
+      - description
+      - id
+      - isOpen
+      - price
+      - rating
+      - stock
+      - thumbnail
+      - title
+    BidDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        creation_date:
+          type: string
+          format: date-time
+          readOnly: true
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        bidder:
+          type: string
+          maxLength: 100
+        auction:
+          type: integer
+      required:
+      - auction
+      - bidder
+      - creation_date
+      - id
+      - price
+    BidListCreate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        creation_date:
+          type: string
+          format: date-time
+          readOnly: true
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        bidder:
+          type: string
+          maxLength: 100
+        auction:
+          type: integer
+      required:
+      - auction
+      - bidder
+      - creation_date
+      - id
+      - price
+    CategoryDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 50
+      required:
+      - id
+      - name
+    CategoryListCreate:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 50
+      required:
+      - id
+      - name
+    PaginatedAuctionListCreateList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/AuctionListCreate'
+    PaginatedBidListCreateList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BidListCreate'
+    PaginatedCategoryListCreateList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryListCreate'
+    PaginatedUserList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+    PatchedAuctionDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        creation_date:
+          type: string
+          format: date-time
+          readOnly: true
+        closing_date:
+          type: string
+          format: date-time
+        isOpen:
+          type: boolean
+          readOnly: true
+        title:
+          type: string
+          maxLength: 150
+        description:
+          type: string
+        thumbnail:
+          type: string
+          format: uri
+          maxLength: 200
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        stock:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 1
+          format: int64
+        rating:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,1}(?:\.\d{0,2})?$
+        brand:
+          type: string
+          maxLength: 100
+        category:
+          type: integer
+        auctioneer:
+          type: integer
+    PatchedBidDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        creation_date:
+          type: string
+          format: date-time
+          readOnly: true
+        price:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,8}(?:\.\d{0,2})?$
+        bidder:
+          type: string
+          maxLength: 100
+        auction:
+          type: integer
+    PatchedCategoryDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 50
+    PatchedUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        birth_date:
+          type: string
+          format: date
+        municipality:
+          type: string
+          maxLength: 100
+        locality:
+          type: string
+          maxLength: 100
+        password:
+          type: string
+          writeOnly: true
+          maxLength: 128
+    TokenObtainPair:
+      type: object
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+          readOnly: true
+      required:
+      - access
+      - password
+      - refresh
+      - username
+    TokenRefresh:
+      type: object
+      properties:
+        access:
+          type: string
+          readOnly: true
+        refresh:
+          type: string
+      required:
+      - access
+      - refresh
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        birth_date:
+          type: string
+          format: date
+        municipality:
+          type: string
+          maxLength: 100
+        locality:
+          type: string
+          maxLength: 100
+        password:
+          type: string
+          writeOnly: true
+          maxLength: 128
+      required:
+      - birth_date
+      - id
+      - password
+      - username
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

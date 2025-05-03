@@ -12,6 +12,12 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 
+import os
+import dj_database_url
+from dotenv import load_dotenv
+from datetime import timedelta
+
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,8 +31,10 @@ SECRET_KEY = 'django-insecure-*mxnxlsl5+ru(bpfi%=)^v3&u4x8qfi44l+(gn3q2ch)u(-4h^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["127.0.0.1"]
-
+ALLOWED_HOSTS = ['localhost', 
+                 '127.0.0.1', 
+                 "@dpg-cvttsvi4d50c73ao3gu0-a.oregon-postgres.render.com",
+                 "solvifyserver.onrender.com"]
 
 # Application definition
 
@@ -38,20 +46,23 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'subastas', #para asociar la nueva aplicación (auction) al proyecto
+    'usuarios',
     'rest_framework', #para importar el framework django REST al proyecto
+    'rest_framework_simplejwt', 
+    'rest_framework_simplejwt.token_blacklist', 
     'drf_spectacular', #para importar la extensión drf spectacular al proyecto
     'corsheaders',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'solvifyServer.urls'
@@ -78,12 +89,17 @@ WSGI_APPLICATION = 'solvifyServer.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+load_dotenv()
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    'default': dj_database_url.config(default=os.getenv("DATABASE_URL"))
     }
-}
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 
 # Password validation
@@ -124,14 +140,17 @@ STATIC_URL = 'static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
-
+# 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 5,
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-}
+    'DEFAULT_AUTHENTICATION_CLASSES': ( 
+        'rest_framework_simplejwt.authentication.JWTAuthentication', 
+    ), 
+    }
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'API Auctions',
@@ -140,5 +159,21 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
 }
 
-CORS_ALLOWED_ORIGINS = ["http://127.0.0.1"]
+# CORS_ALLOWED_ORIGINS = [
+#     "127.0.0.1:3000",
+#     "localhost:3000",
+#     "https://solvify-das.vercel.app/"
+# ]
+
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_CREDENTIALS = True
+
+SIMPLE_JWT = { 
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1), 
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7), 
+    "ROTATE_REFRESH_TOKENS": True, 
+    "BLACKLIST_AFTER_ROTATION": True,  
+} 
+
+AUTH_USER_MODEL = 'usuarios.CustomUser'
+
