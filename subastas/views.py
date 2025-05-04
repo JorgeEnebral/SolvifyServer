@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
-from .models import Category, Auction, Bid
-from .serializers import CategoryListCreateSerializer, CategoryDetailSerializer, AuctionListCreateSerializer, AuctionDetailSerializer, BidListCreateSerializer, BidDetailSerializer
+from .models import Category, Auction, Bid, Rating
+from .serializers import CategoryListCreateSerializer, CategoryDetailSerializer, AuctionListCreateSerializer, AuctionDetailSerializer, BidListCreateSerializer, BidDetailSerializer, RatingListCreateSerializer, RatingDetailSerializer
 from django.db.models import Q
 from rest_framework.views import APIView 
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
@@ -128,3 +128,39 @@ class UserBidListView(APIView):
         user_bids = Bid.objects.filter(bidder=request.user)
         serializer = BidListCreateSerializer(user_bids, many=True)
         return Response(serializer.data)
+    
+class RatingListCreate(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = RatingListCreateSerializer
+
+    def create(self, request, *args, **kwargs):
+        reviewer = request.user
+        auction_id = request.data.get("auction")
+
+        if not auction_id:
+            return Response({
+                "auction": "Auction field is required."
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            existing = Rating.objects.get(reviewer=reviewer, auction_id=auction_id)
+            serializer = self.get_serializer(existing, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_update(serializer)
+            return Response(serializer.data, status=200)
+        except Rating.DoesNotExist:
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            return Response(serializer.data, status=201)
+        
+    def perform_create(self, serializer):
+        serializer.save(reviewer=self.request.user)
+
+class RatingRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsOwnerOrAdmin]
+    serializer_class = RatingDetailSerializer
+    
+    def get_queryset(self):
+        auction_id = self.kwargs["auction_id"]
+        return Rating.objects.filter(reviewer=self.request.user, auction_id=auction_id)

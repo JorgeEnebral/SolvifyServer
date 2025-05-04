@@ -22,9 +22,6 @@ class Auction(models.Model):
                                 decimal_places=2,
                                 validators=[MinValueValidator(0)])
     stock = models.IntegerField(validators=[MinValueValidator(1)])
-    rating = models.DecimalField(max_digits=3,
-                                 decimal_places=2,
-                                 validators=[MinValueValidator(1), MaxValueValidator(5)])
     category = models.ForeignKey(Category, related_name='auctions',
         on_delete=models.CASCADE)
     brand = models.CharField(max_length=100)
@@ -48,3 +45,17 @@ class Bid(models.Model):
  
     def __str__(self): 
         return self.bidder
+    
+class Rating(models.Model):
+    rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], default=1)
+    reviewer = models.ForeignKey(CustomUser, related_name='ratings', on_delete=models.CASCADE)
+    auction = models.ForeignKey(Auction, related_name='ratings', on_delete=models.CASCADE)
+
+    class Meta:
+        ordering=('id',)
+        constraints = [
+            models.UniqueConstraint(fields=['reviewer', 'auction'], name='unique_reviewer_auction')
+        ]
+    
+    def __str__(self):
+        return f"{self.reviewer} - {self.auction} ({self.rating})"

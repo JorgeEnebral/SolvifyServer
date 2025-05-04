@@ -1,9 +1,10 @@
 from drf_spectacular.utils import extend_schema_field 
 from rest_framework import serializers 
 from django.utils import timezone 
-from .models import Category, Auction, Bid
+from .models import Category, Auction, Bid, Rating
 from datetime import timedelta
-
+from rest_framework.validators import UniqueTogetherValidator
+from django.db.models import Avg
 
 class CategoryListCreateSerializer(serializers.ModelSerializer): 
     class Meta: 
@@ -22,6 +23,7 @@ class AuctionListCreateSerializer(serializers.ModelSerializer):
     closing_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ") 
     # El isOpen no es del modelo, por lo que tenemos que crearlo como un serializador
     isOpen = serializers.SerializerMethodField(read_only=True) 
+    rating = serializers.SerializerMethodField(read_only=True)
 
     class Meta: 
         model = Auction 
@@ -39,10 +41,16 @@ class AuctionListCreateSerializer(serializers.ModelSerializer):
                                               greater than creation date.")
         return value
     
+    @extend_schema_field(serializers.DecimalField(max_digits=10, decimal_places=2))
+    def get_rating(self, obj):
+        avg_rating = Rating.objects.filter(auction=obj.auction).aggregate(Avg("rating"))["rating__avg"]
+        return avg_rating if avg_rating is not None else 0
+    
 class AuctionDetailSerializer(serializers.ModelSerializer): 
     creation_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ", read_only=True) 
     closing_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ")
     isOpen = serializers.SerializerMethodField(read_only=True)
+    rating = serializers.SerializerMethodField(read_only=True)
 
     class Meta: 
         model = Auction 
@@ -60,6 +68,11 @@ class AuctionDetailSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Closing date must be at least 15 days \
                                               greater than creation date.")
         return value
+    
+    @extend_schema_field(serializers.DecimalField(max_digits=10, decimal_places=2))
+    def get_rating(self, obj):
+        avg_rating = Rating.objects.filter(auction=obj.auction).aggregate(Avg("rating"))["rating__avg"]
+        return avg_rating if avg_rating is not None else 0
     
 class BidListCreateSerializer(serializers.ModelSerializer):
     creation_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ", read_only=True) 
@@ -104,3 +117,49 @@ class BidDetailSerializer(serializers.ModelSerializer):
         if not auction_serializer.data["isOpen"]:
             raise serializers.ValidationError("The auction has already closed. No more bids are allowed.")
         return value
+    
+class RatingListCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rating
+        fields = '__all__'
+
+    def validate_rating(self, value):
+        if value < 1 or value > 5:
+            raise serializers.ValidationError("Rating must be between 1 and 5.")
+        return value
+
+    def validate(self, data):
+        reviewer = data["reviewer"]
+        auction = data["auction"]
+        instance = getattr(self, 'instance', None) # actual rating being modified
+        existing = Rating.objects.filter(reviewer=reviewer, auction=auction)
+        if instance:
+            existing = existing.exclude(pf=instance.pk)
+
+        if existing.exists():
+            raise serializers.ValidationError("You have already rated this auction.")
+        
+        return data
+    
+class RatingDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Rating
+        fields = '__all__'
+
+    def validate_rating(self, value):
+        if value < 1 or value > 5:
+            raise serializers.ValidationError("Rating must be between 1 and 5.")
+        return value
+
+    def validate(self, data):
+        reviewer = data["reviewer"]
+        auction = data["auction"]
+        instance = getattr(self, 'instance', None) # actual rating being modified
+        existing = Rating.objects.filter(reviewer=reviewer, auction=auction)
+        if instance:
+            existing = existing.exclude(pf=instance.pk)
+
+        if existing.exists():
+            raise serializers.ValidationError("You have already rated this auction.")
+        
+        return data
