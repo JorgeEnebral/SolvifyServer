@@ -12,7 +12,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "solvifyServer.settings")
 django.setup()
 
 # Ahora puedes importar los modelos
-from subastas.models import Category, Auction, Bid  
+from subastas.models import Category, Auction, Bid, Rating
 from usuarios.models import CustomUser
 from django.utils import timezone
 
@@ -102,6 +102,23 @@ def crear_pujas(productos, admin, user1, user2):
 
     crear_puja(user1, productos[2], 18)
 
+def crear_ratings(productos, admin, user1, user2):
+
+    def crear_rating(user, auction, score):
+        if not Rating.objects.filter(reviewer=user, auction=auction).exists():
+            Rating.objects.create(rating=score, reviewer=user, auction=auction)
+
+    usuarios = [admin, user1, user2]
+    puntajes = [1,2,3,4,5]
+
+    for product in productos:
+        reviewers_disponibles = usuarios.copy()
+        random.shuffle(reviewers_disponibles)
+
+        for score in random.sample(puntajes, k=random.randint(1, len(reviewers_disponibles))):
+            if reviewers_disponibles:
+                user = reviewers_disponibles.pop()
+                crear_rating(user, product, score)
 
 def load_data_to_local_db(products):
 
@@ -135,7 +152,7 @@ def load_data_to_local_db(products):
             thumbnail=product["thumbnail"],
             price=product["price"],
             stock=product["stock"],
-            rating=product["rating"],
+            # rating=product["rating"],
             category=categories[product["category"]],
             brand=product.get("brand", "Desconocida"),
             auctioneer=admin
@@ -143,6 +160,7 @@ def load_data_to_local_db(products):
         productos.append(auction)
 
     crear_pujas(productos, admin, user1, user2)
+    crear_ratings(productos, admin, user1, user2)
 
     print("Datos de dummyjson cargados a la BBDD")
 

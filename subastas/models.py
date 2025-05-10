@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from usuarios.models import CustomUser
+from decimal import Decimal
 
 # Create your models here.
 class Category(models.Model):
@@ -20,11 +21,11 @@ class Auction(models.Model):
     thumbnail = models.URLField()
     price = models.DecimalField(max_digits=10,
                                 decimal_places=2,
-                                validators=[MinValueValidator(0)])
+                                validators=[MinValueValidator(Decimal('0.00'))])
     stock = models.IntegerField(validators=[MinValueValidator(1)])
-    rating = models.DecimalField(max_digits=3,
-                                 decimal_places=2,
-                                 validators=[MinValueValidator(1), MaxValueValidator(5)])
+    # rating = models.DecimalField(max_digits=3,
+    #                              decimal_places=2,
+    #                              validators=[MinValueValidator(Decimal('1.00')), MaxValueValidator(Decimal('5.00'))])
     category = models.ForeignKey(Category, related_name='auctions',
         on_delete=models.CASCADE)
     brand = models.CharField(max_length=100)
@@ -39,7 +40,7 @@ class Auction(models.Model):
 
 class Bid(models.Model):
     auction = models.ForeignKey(Auction, related_name='bids', on_delete=models.CASCADE)
-    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0)])
+    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(Decimal('0.00'))])
     creation_date = models.DateTimeField(auto_now_add=True)
     bidder = models.CharField(max_length=100)
 
@@ -48,3 +49,17 @@ class Bid(models.Model):
  
     def __str__(self): 
         return self.bidder
+    
+class Rating(models.Model):
+    rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], default=1)
+    reviewer = models.ForeignKey(CustomUser, related_name='ratings', on_delete=models.CASCADE)
+    auction = models.ForeignKey(Auction, related_name='ratings', on_delete=models.CASCADE)
+
+    class Meta:
+        ordering=('id',)
+        constraints=[
+            models.UniqueConstraint(fields=['reviewer', 'auction'], name='unique_reviewer_auction')
+        ]
+
+    def __str__(self):
+        return f"Auction: {self.auction} - Reviewer: {self.reviewer} - Rating: {self.rating}"

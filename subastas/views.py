@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
-from .models import Category, Auction, Bid
-from .serializers import CategoryListCreateSerializer, CategoryDetailSerializer, AuctionListCreateSerializer, AuctionDetailSerializer, BidListCreateSerializer, BidDetailSerializer
+from .models import Category, Auction, Bid, Rating
+from .serializers import CategoryListCreateSerializer, CategoryDetailSerializer, AuctionListCreateSerializer, AuctionDetailSerializer, BidListCreateSerializer, BidDetailSerializer, RatingListCreateSerializer, RatingDetailSerializer
 from django.db.models import Q
 from rest_framework.views import APIView 
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
@@ -128,3 +128,21 @@ class UserBidListView(APIView):
         user_bids = Bid.objects.filter(bidder=request.user)
         serializer = BidListCreateSerializer(user_bids, many=True)
         return Response(serializer.data)
+    
+class RatingList(APIView):
+    # queryset = Rating.objects.all()
+    # serializer_class = RatingListCreateSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user_ratings = Rating.objects.filter(reviewer=request.user)
+        serializer = RatingListCreateSerializer(user_ratings, many=True)
+        return Response(serializer.data)
+    
+class RatingRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Rating.objects.all()
+    serializer_class = RatingDetailSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Rating.objects.filter(reviewer=self.request.user)
