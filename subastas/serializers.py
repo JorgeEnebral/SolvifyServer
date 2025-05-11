@@ -60,6 +60,7 @@ class AuctionDetailSerializer(serializers.ModelSerializer):
     closing_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ")
     isOpen = serializers.SerializerMethodField(read_only=True)
     average_rating = serializers.SerializerMethodField()
+    user_rating = serializers.SerializerMethodField()
 
     class Meta: 
         model = Auction 
@@ -74,6 +75,15 @@ class AuctionDetailSerializer(serializers.ModelSerializer):
         avg = obj.ratings.aggregate(avg=Avg("rating"))["avg"]
         return round(avg, 2) if avg is not None else None
 
+    @extend_schema_field(serializers.IntegerField())
+    def get_user_rating(self, obj):
+        request = self.context.get("request")
+        if request and request.user.is_authenticated:
+            rating = obj.ratings.filter(reviewer=request.user).first()
+            if rating:
+                return rating.rating
+        return None
+    
     def validate_closing_date(self, value):
         creation_date = self.instance.creation_date
         if value <= timezone.now():
