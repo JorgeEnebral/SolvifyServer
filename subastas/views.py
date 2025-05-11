@@ -1,13 +1,13 @@
 from django.shortcuts import render
 from rest_framework import generics, status
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, NotFound
 from .models import Category, Auction, Bid, Rating
 from .serializers import CategoryListCreateSerializer, CategoryDetailSerializer, AuctionListCreateSerializer, AuctionDetailSerializer, BidListCreateSerializer, BidDetailSerializer, RatingListCreateSerializer, RatingRetrieveSerializer, RatingUpdateDestroySerializer
 from django.db.models import Q
 from rest_framework.views import APIView 
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
 from rest_framework.response import Response
-from .permissions import IsOwnerOrAdmin, IsRegisteredUserOrAdmin
+from .permissions import IsOwnerOrAdmin, IsRegisteredUserOrAdmin, IsOwnerOrAdminAuction
 
 # Create your views here.
 # class CategoryListCreate(generics.ListCreateAPIView): SI NO NO PUEDO PONER EN LA WEB LAS CATEGORÍAS COMO NOMBRE PARA LOS USUARIOS
@@ -87,7 +87,7 @@ class AuctionListCreate(generics.ListCreateAPIView):
         return queryset
 
 class AuctionRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView): 
-    permission_classes = [IsOwnerOrAdmin] 
+    permission_classes = [IsOwnerOrAdminAuction] 
     queryset = Auction.objects.all() 
     serializer_class = AuctionDetailSerializer
 
@@ -129,25 +129,31 @@ class UserBidListView(APIView):
         serializer = BidListCreateSerializer(user_bids, many=True)
         return Response(serializer.data)
     
-class RatingList(APIView):
-    # queryset = Rating.objects.all()
-    # serializer_class = RatingListCreateSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request, *args, **kwargs):
-        user_ratings = Rating.objects.filter(reviewer=request.user)
-        serializer = RatingListCreateSerializer(user_ratings, many=True)
-        return Response(serializer.data)
-    
-class RatingRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+class RatingList(generics.ListCreateAPIView):
+    serializer_class = RatingListCreateSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        if self.request.method == "GET":
-            return Rating.objects.all()
-        
         return Rating.objects.filter(reviewer=self.request.user)
     
+    def perform_create(self, serializer):
+        auction_id = self.request.data.get("auction")
+        if Rating.objects.filter(reviewer=self.request.user, auction=auction_id).exists():
+            raise ValidationError("Ya has calificado este producto.")
+        serializer.save(reviewer=self.request.user)
+    
+class RatingRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get_object(self):
+        auction_id = self.kwargs.get("id_auctions")
+        user = self.request.user
+
+        try:
+            return Rating.objects.get(auction_id=auction_id, reviewer=user)
+        except Rating.DoesNotExist:
+            raise NotFound("There is no rating for this auction made by this user.")
+        
     def get_serializer_class(self):
         if self.request.method == "GET":
             return RatingRetrieveSerializer

@@ -17,5 +17,5 @@ urlpatterns = [
     path('mis-pujas/', UserBidListView.as_view(), name='bids-from-users'),
 
     path('mis-ratings/', RatingList.as_view(), name='rating-list-create'),
-    path('mis-ratings/<int:pk>/', RatingRetrieveUpdateDestroy.as_view(), name='rating-detail'),
+    path('mis-ratings/<int:id_auctions>/', RatingRetrieveUpdateDestroy.as_view(), name='rating-detail'),
 ]

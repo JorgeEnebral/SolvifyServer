@@ -60,11 +60,12 @@ class AuctionDetailSerializer(serializers.ModelSerializer):
     closing_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ")
     isOpen = serializers.SerializerMethodField(read_only=True)
     average_rating = serializers.SerializerMethodField()
-    user_rating = serializers.SerializerMethodField()
+    user_rating = serializers.SerializerMethodField(required=False)
 
     class Meta: 
         model = Auction 
         fields = '__all__' 
+        read_only_fields = ['auctioneer', 'creation_date']
 
     @extend_schema_field(serializers.BooleanField())
     def get_isOpen(self, obj): 
@@ -85,12 +86,12 @@ class AuctionDetailSerializer(serializers.ModelSerializer):
         return None
     
     def validate_closing_date(self, value):
-        creation_date = self.instance.creation_date
-        if value <= timezone.now():
-            raise serializers.ValidationError("Closing date must be greater than now.")
-        elif value < creation_date + timedelta(days=15):
-            raise serializers.ValidationError("Closing date must be at least 15 days \
-                                              greater than creation date.")
+        if self.instance:
+            creation_date = self.instance.creation_date
+            if value <= timezone.now():
+                raise serializers.ValidationError("Closing date must be greater than now.")
+            elif value < creation_date + timedelta(days=15):
+                raise serializers.ValidationError("Closing date must be at least 15 days greater than creation date.")
         return value
     
 class BidListCreateSerializer(serializers.ModelSerializer):
@@ -139,7 +140,7 @@ class BidDetailSerializer(serializers.ModelSerializer):
     
 class RatingListCreateSerializer(serializers.ModelSerializer):
     reviewer = serializers.HiddenField(default=serializers.CurrentUserDefault())
-    rating = serializers.IntegerField(read_only=True)
+    rating = serializers.IntegerField(min_value=1, max_value=5, required=False, default=1)
 
     class Meta:
         model = Rating
