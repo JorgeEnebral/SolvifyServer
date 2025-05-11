@@ -140,7 +140,22 @@ class RatingListCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("You have already rated this auction.")
         return data
     
-class RatingDetailSerializer(serializers.ModelSerializer):
+class RatingRetrieveSerializer(serializers.ModelSerializer):
+    reviewer = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    average_rating = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Rating
+        fields = '__all__'
+        read_only_fields = ['id', 'reviewer', 'auction']
+
+    @extend_schema_field(serializers.DecimalField(max_digits=3, decimal_places=2))
+    def get_average_rating(self, obj):
+        avg = Rating.objects.filter(auction=obj.auction).aggregate(avg=Avg("rating"))["avg"]
+        return round(avg, 2) if avg is not None else None
+    
+    
+class RatingUpdateDestroySerializer(serializers.ModelSerializer):
     reviewer = serializers.HiddenField(default=serializers.CurrentUserDefault())
     class Meta:
         model = Rating

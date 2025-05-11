@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError
 from .models import Category, Auction, Bid, Rating
-from .serializers import CategoryListCreateSerializer, CategoryDetailSerializer, AuctionListCreateSerializer, AuctionDetailSerializer, BidListCreateSerializer, BidDetailSerializer, RatingListCreateSerializer, RatingDetailSerializer
+from .serializers import CategoryListCreateSerializer, CategoryDetailSerializer, AuctionListCreateSerializer, AuctionDetailSerializer, BidListCreateSerializer, BidDetailSerializer, RatingListCreateSerializer, RatingRetrieveSerializer, RatingUpdateDestroySerializer
 from django.db.models import Q
 from rest_framework.views import APIView 
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
@@ -140,9 +140,15 @@ class RatingList(APIView):
         return Response(serializer.data)
     
 class RatingRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Rating.objects.all()
-    serializer_class = RatingDetailSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
+        if self.request.method == "GET":
+            return Rating.objects.all()
+        
         return Rating.objects.filter(reviewer=self.request.user)
+    
+    def get_serializer_class(self):
+        if self.request.method == "GET":
+            return RatingRetrieveSerializer
+        return RatingUpdateDestroySerializer
