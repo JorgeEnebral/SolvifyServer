@@ -15,9 +15,6 @@ class IsOwnerOrAdmin(BasePermission):
         for field in owner_fields:
             if hasattr(obj, field):
                 return getattr(obj, field) == request.user or request.user.is_staff
-            
-        # Permitir si el usuario es el creador o es administrador 
-        return obj.bidder == request.user or request.user.is_staff
     
 class IsOwnerOrAdminAuction(BasePermission): 
     """ 

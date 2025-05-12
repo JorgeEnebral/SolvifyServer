@@ -91,9 +91,13 @@ class AuctionListCreate(generics.ListCreateAPIView):
         return [IsRegisteredUserOrAdmin]
     
 class AuctionRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView): 
-    permission_classes = [IsOwnerOrAdminAuction] 
     queryset = Auction.objects.all() 
     serializer_class = AuctionDetailSerializer
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [AllowAny()]
+        return [IsOwnerOrAdminAuction()]
 
 
 class BidListCreate(generics.ListCreateAPIView):
@@ -175,6 +179,11 @@ class RatingRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
         return RatingUpdateDestroySerializer
     
 
+class CommentListView(generics.ListCreateAPIView):
+    serializer_class = CommentListCreateSerializer
+    permission_classes = [AllowAny]
+    queryset = Comment.objects.all()
+
 class CommentListCreateView(generics.ListCreateAPIView):
     serializer_class = CommentListCreateSerializer
 
@@ -193,11 +202,7 @@ class CommentListCreateView(generics.ListCreateAPIView):
 
 class CommentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CommentDetailSerializer
-
-    def get_queryset(self):
-        auction_id = self.kwargs["id_auctions"]
-        comment_id = self.kwargs["pk"]
-        return Comment.objects.filter(auction_id=auction_id, id=comment_id)
+    queryset = Comment.objects.all()
 
     def get_permissions(self):
         if self.request.method == "GET":
