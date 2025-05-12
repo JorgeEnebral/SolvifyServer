@@ -49,7 +49,8 @@ class Bid(models.Model):
  
     def __str__(self): 
         return self.bidder
-    
+
+
 class Rating(models.Model):
     rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], default=1)
     reviewer = models.ForeignKey(CustomUser, related_name='ratings', on_delete=models.CASCADE)
@@ -63,3 +64,18 @@ class Rating(models.Model):
 
     def __str__(self):
         return f"Auction: {self.auction} - Reviewer: {self.reviewer} - Rating: {self.rating}"
+
+
+class Comment(models.Model):
+    title = models.CharField(max_length=100)
+    content = models.TextField()
+    creation_date = models.DateTimeField(auto_now_add=True)
+    update_date = models.DateTimeField(auto_now=True)
+    author = models.ForeignKey(CustomUser, related_name='comments', on_delete=models.CASCADE)
+    auction = models.ForeignKey(Auction, related_name='comments', on_delete=models.CASCADE)
+
+    class Meta:
+        ordering=('id',)
+
+    def __str__(self):
+        return f"Auction: {self.auction} - Author: {self.author} - Title: {self.title}"

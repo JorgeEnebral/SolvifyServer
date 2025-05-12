@@ -1,7 +1,7 @@
 from drf_spectacular.utils import extend_schema_field 
 from rest_framework import serializers 
 from django.utils import timezone 
-from .models import Category, Auction, Bid, Rating
+from .models import Category, Auction, Bid, Rating, Comment
 from datetime import timedelta
 from django.db.models import Avg
 
@@ -94,6 +94,7 @@ class AuctionDetailSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("Closing date must be at least 15 days greater than creation date.")
         return value
     
+
 class BidListCreateSerializer(serializers.ModelSerializer):
     creation_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ", read_only=True) 
     class Meta:
@@ -138,6 +139,7 @@ class BidDetailSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("The auction has already closed. No more bids are allowed.")
         return value
     
+
 class RatingListCreateSerializer(serializers.ModelSerializer):
     reviewer = serializers.HiddenField(default=serializers.CurrentUserDefault())
     rating = serializers.IntegerField(min_value=1, max_value=5, required=False, default=1)
@@ -158,20 +160,19 @@ class RatingRetrieveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating
         fields = '__all__'
-        read_only_fields = ['id', 'reviewer', 'auction']
+        read_only_fields = ['id', 'reviewer', 'auction', 'average_rating']
 
     @extend_schema_field(serializers.DecimalField(max_digits=3, decimal_places=2))
     def get_average_rating(self, obj):
         avg = Rating.objects.filter(auction=obj.auction).aggregate(avg=Avg("rating"))["avg"]
         return round(avg, 2) if avg is not None else None
     
-    
 class RatingUpdateDestroySerializer(serializers.ModelSerializer):
     reviewer = serializers.HiddenField(default=serializers.CurrentUserDefault())
     class Meta:
         model = Rating
         fields = '__all__'
-        read_only_fields = ['id', 'reviewer', 'auction']
+        read_only_fields = ['id', 'reviewer', 'auction', 'average_rating']
 
     def validate_rating(self, value):
         if not isinstance(value, int):
@@ -192,3 +193,43 @@ class RatingUpdateDestroySerializer(serializers.ModelSerializer):
         if Rating.objects.filter(reviewer=reviewer, auction=auction).exclude(pk=getattr(instance, 'pk', None)).exists():
             raise serializers.ValidationError("This reviewer has already rated this auction")
         return data
+
+
+class CommentListCreateSerializer(serializers.ModelSerializer):
+    creation_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ", read_only=True) 
+    update_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ", read_only=True) 
+
+    class Meta:
+        model = Comment
+        fields = '__all__'
+
+    def validate_title(self, value):
+        if len(value) > 100:
+            raise serializers.ValidationError("Title must bu shorter than 100 characters")
+        return value
+    
+    def validate_auction(self, value):
+        auction_serializer = AuctionListCreateSerializer(value)
+        if not auction_serializer.data["isOpen"]:
+            raise serializers.ValidationError("The auction has already closed. No more bids are allowed.")
+        return value
+
+class CommentDetailSerializer(serializers.ModelSerializer):
+    creation_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ", read_only=True) 
+    update_date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ", read_only=True) 
+
+    class Meta:
+        model = Comment
+        fields = '__all__'
+        read_only_fields = ['id', 'auction', 'author', 'creation_date', 'update_date']
+
+    def validate_title(self, value):
+        if len(value) > 100:
+            raise serializers.ValidationError("Title must bu shorter than 100 characters")
+        return value
+    
+    def validate_auction(self, value):
+        auction_serializer = AuctionListCreateSerializer(value)
+        if not auction_serializer.data["isOpen"]:
+            raise serializers.ValidationError("The auction has already closed. No more bids are allowed.")
+        return value

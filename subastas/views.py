@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from rest_framework import generics, status
 from rest_framework.exceptions import ValidationError, NotFound
-from .models import Category, Auction, Bid, Rating
-from .serializers import CategoryListCreateSerializer, CategoryDetailSerializer, AuctionListCreateSerializer, AuctionDetailSerializer, BidListCreateSerializer, BidDetailSerializer, RatingListCreateSerializer, RatingRetrieveSerializer, RatingUpdateDestroySerializer
+from .models import Category, Auction, Bid, Rating, Comment
+from .serializers import CategoryListCreateSerializer, CategoryDetailSerializer, AuctionListCreateSerializer, AuctionDetailSerializer, BidListCreateSerializer, BidDetailSerializer, RatingListCreateSerializer, RatingRetrieveSerializer, RatingUpdateDestroySerializer, CommentListCreateSerializer, CommentDetailSerializer
 from django.db.models import Q
 from rest_framework.views import APIView 
 from rest_framework.permissions import IsAuthenticated, AllowAny, IsAdminUser
@@ -32,7 +32,6 @@ class CategoryRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
 
 
 class AuctionListCreate(generics.ListCreateAPIView):
-    permission_classes = [IsRegisteredUserOrAdmin] 
     serializer_class = AuctionListCreateSerializer
 
     def get_queryset(self):
@@ -86,6 +85,11 @@ class AuctionListCreate(generics.ListCreateAPIView):
         
         return queryset
 
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [AllowAny()]
+        return [IsRegisteredUserOrAdmin]
+    
 class AuctionRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView): 
     permission_classes = [IsOwnerOrAdminAuction] 
     queryset = Auction.objects.all() 
@@ -111,11 +115,12 @@ class BidRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
     def get_queryset(self):
         auction_id = self.kwargs["id_auctions"]
         bid_id = self.kwargs["pk"]
-        return Bid.objects.filter(auction_id=auction_id, id=bid_id)
+        return Bid.objects.filter(auction=auction_id, id=bid_id)
     
 
 class UserAuctionListView(APIView): 
     permission_classes = [IsAuthenticated] 
+
     def get(self, request, *args, **kwargs): 
         # Obtener las subastas del usuario autenticado 
         user_auctions = Auction.objects.filter(auctioneer=request.user) 
@@ -124,11 +129,21 @@ class UserAuctionListView(APIView):
     
 class UserBidListView(APIView):
     permission_classes = [IsAuthenticated]
+
     def get(self, request, *args, **kwargs):
         user_bids = Bid.objects.filter(bidder=request.user)
         serializer = BidListCreateSerializer(user_bids, many=True)
         return Response(serializer.data)
     
+class UserCommentListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user_comments = Comment.objects.filter(author=request.user)
+        serializer = CommentListCreateSerializer(user_comments, many=True)
+        return Response(serializer.data)
+    
+
 class RatingList(generics.ListCreateAPIView):
     serializer_class = RatingListCreateSerializer
     permission_classes = [IsAuthenticated]
@@ -158,3 +173,33 @@ class RatingRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method == "GET":
             return RatingRetrieveSerializer
         return RatingUpdateDestroySerializer
+    
+
+class CommentListCreateView(generics.ListCreateAPIView):
+    serializer_class = CommentListCreateSerializer
+
+    def get_queryset(self):
+        auction_id = self.kwargs['id_auctions']
+        return Comment.objects.filter(auction_id=auction_id)
+
+    def perform_create(self, serializer):
+        auction_id = self.kwargs['id_auctions']
+        serializer.save(author=self.request.user, auction_id=auction_id)
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [IsAuthenticated()]
+        return [AllowAny()]
+
+class CommentRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = CommentDetailSerializer
+
+    def get_queryset(self):
+        auction_id = self.kwargs["id_auctions"]
+        comment_id = self.kwargs["pk"]
+        return Comment.objects.filter(auction_id=auction_id, id=comment_id)
+
+    def get_permissions(self):
+        if self.request.method == "GET":
+            return [AllowAny()]
+        return [IsOwnerOrAdmin()]
