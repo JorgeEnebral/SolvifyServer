@@ -33,8 +33,8 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['localhost', 
                  '127.0.0.1',
-                 '@dpg-d0id748dl3ps739ja5h0-a.oregon-postgres.render.com',]
-                #  "solvifyserver.onrender.com"]
+                 '@dpg-d0id748dl3ps739ja5h0-a.oregon-postgres.render.com',
+                 'solvifyserver.onrender.com']
 
 # Application definition
 
