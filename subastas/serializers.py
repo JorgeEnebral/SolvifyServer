@@ -201,7 +201,7 @@ class CommentListCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = '__all__'
+        exclude = ['author', 'auction']
 
     def validate_title(self, value):
         if len(value) > 100:
@@ -220,8 +220,8 @@ class CommentDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = '__all__'
-        read_only_fields = ['id', 'auction', 'author', 'creation_date', 'update_date']
+        exclude = ['author', 'auction']
+        read_only_fields = ['id', 'creation_date', 'update_date']
 
     def validate_title(self, value):
         if len(value) > 100:
