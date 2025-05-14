@@ -32,9 +32,9 @@ SECRET_KEY = 'django-insecure-*mxnxlsl5+ru(bpfi%=)^v3&u4x8qfi44l+(gn3q2ch)u(-4h^
 DEBUG = False
 
 ALLOWED_HOSTS = ['localhost', 
-                 '127.0.0.1',
-                 '@dpg-d0id748dl3ps739ja5h0-a.oregon-postgres.render.com',
-                 'solvifyserver.onrender.com']
+                 '127.0.0.1']
+                #  '@dpg-d0id748dl3ps739ja5h0-a.oregon-postgres.render.com',
+                #  'solvifyserver.onrender.com']
 
 # Application definition
 
@@ -89,17 +89,17 @@ WSGI_APPLICATION = 'solvifyServer.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-load_dotenv()
-DATABASES = {
-    'default': dj_database_url.config(default=os.getenv("DATABASE_URL"))
-    }
-
+# load_dotenv()
 # DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
+#     'default': dj_database_url.config(default=os.getenv("DATABASE_URL"))
 #     }
-# }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
 
 # Password validation
