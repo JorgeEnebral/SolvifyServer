@@ -61,7 +61,7 @@ def crear_usuarios():
         last_name="1",
         email="user1@example.com",
         password="user1_1234",
-        is_staff=False,
+        is_staff=True,
         is_active=True,
         is_superuser=False,
         last_login=timezone.now(),
@@ -70,14 +70,14 @@ def crear_usuarios():
         locality="Centro",
         municipality="Capital"
     )
-
+    
     user2 = CustomUser.objects.create(
         username="user2",
         first_name="user",
         last_name="2",
         email="user2@example.com",
         password="user2_1234",
-        is_staff=False,
+        is_staff=True,
         is_active=True,
         is_superuser=False,
         last_login=timezone.now(),

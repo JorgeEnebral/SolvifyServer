@@ -88,7 +88,7 @@ class AuctionListCreate(generics.ListCreateAPIView):
     def get_permissions(self):
         if self.request.method == "GET":
             return [AllowAny()]
-        return [IsRegisteredUserOrAdmin]
+        return [IsRegisteredUserOrAdmin()]
     
 class AuctionRetrieveUpdateDestroy(generics.RetrieveUpdateDestroyAPIView): 
     queryset = Auction.objects.all() 

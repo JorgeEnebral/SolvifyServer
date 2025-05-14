@@ -47,7 +47,8 @@ class AuctionListCreateSerializer(serializers.ModelSerializer):
         return value
     
     def create(self, validated_data):
-        auction = Auction.objects.create(**validated_data)
+        request = self.context["request"]
+        auction = Auction.objects.create(**validated_data, auctioneer=request.user)
         Rating.objects.create(
             auction=auction,
             reviewer=self.context["request"].user,
@@ -201,7 +202,8 @@ class CommentListCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        exclude = ['author', 'auction']
+        exclude = ['author']
+        read_only_fields = ['id', 'auction', 'creation_date', 'update_date']
 
     def validate_title(self, value):
         if len(value) > 100:
@@ -220,8 +222,8 @@ class CommentDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        exclude = ['author', 'auction']
-        read_only_fields = ['id', 'creation_date', 'update_date']
+        exclude = ['author']
+        read_only_fields = ['id', 'auction', 'creation_date', 'update_date']
 
     def validate_title(self, value):
         if len(value) > 100:
